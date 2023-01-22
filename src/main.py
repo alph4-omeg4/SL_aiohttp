@@ -1,3 +1,4 @@
+import logging
 
 from aiohttp import web
 from aiohttp_security import SessionIdentityPolicy
@@ -13,13 +14,11 @@ from src.database.db_authorization import DBAuthorizationPolicy
 from src.database.db import init_db
 from src.settings import load_config, CONFIG_PATH
 
+
 config = load_config(CONFIG_PATH)
 
-
-async def current_user(request):
-    username = await authorized_userid(request)
-    is_anonymous = not bool(username)
-    return {'current_user': {'is_anonymous': is_anonymous}}
+log = logging.getLogger(__name__)
+log.debug('started')
 
 #
 # async def init_redis(app):
@@ -38,9 +37,12 @@ async def current_user(request):
 
 async def init_app(config):
 
+    logging.basicConfig(level=logging.DEBUG)
+
     app = web.Application()
 
     app['config'] = config
+    log.debug(f"init w config {app['config']}")
 
     app.router.add_routes(routes)
 
@@ -53,10 +55,10 @@ async def init_app(config):
     setup_security(app,
                    SessionIdentityPolicy(),
                    DBAuthorizationPolicy(db_pool))
-    setup_swagger(app, swagger_url="/docs", swagger_from_file="swagger.json")
+    setup_swagger(app, swagger_url="/docs", swagger_from_file="openapi_doc.json")
 
-    # s = SwaggerDocs(app, components="sl_swag.yaml", swagger_ui_settings=SwaggerUiSettings(path="/docs"))
-    # s.add_routes(routes)
+
+    log.debug('started')
 
     return app
 

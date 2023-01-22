@@ -1,16 +1,89 @@
 {
   "info": {
-    "description": " ",
+    "description": "\r\n  ",
     "version": "1.0.0",
     "title": "SL_aiohttp Swagger Doc"
   },
   "tags": [
     {
-      "name": "User db crud",
+      "name": "Index",
       "description": ""
     }
   ],
   "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "Index"
+        ],
+        "summary": "Show index p",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema":
+          }
+        },
+        "parameters": []
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "User auth"
+        ],
+        "summary": "Create a new user",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "201": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/login_form"
+            }
+          },
+          "400": {
+            "description": "Failed. Wrong data."
+          }
+        },
+        "parameters": [
+          {
+            "description": "User Request Post Object",
+            "required": true,
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "login": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ]
+      }
+    },
+    "/logout": {
+      "get": {
+        "tags": [
+          "User auth"
+        ],
+        "summary": "Logout",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": 0
+          }
+        },
+        "parameters": []
+      }
+    },
     "/users": {
       "get": {
         "tags": [
@@ -21,7 +94,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/users Response"
+              "$ref": "#/definitions/users list"
             }
           }
         },
@@ -37,13 +110,10 @@
         ],
         "responses": {
           "201": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/login"
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Failed. Wrong data."
+            "description": "Failed."
           }
         },
         "parameters": [
@@ -52,8 +122,7 @@
             "required": true,
             "name": "body",
             "in": "body",
-            "schema": {
-              "$ref": "#/definitions/user"
+            "schema": {"$ref": "#/definitions/user"
             }
           }
         ],
@@ -71,7 +140,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "uuid",
+            "name": "login",
             "required": true,
             "description": "User Request login"
           }
@@ -84,10 +153,10 @@
             }
           },
           "400": {
-            "description": "Failed. Wrong data."
+            "description": "Failed."
           },
           "404": {
-            "description": "Failed. User was not found."
+            "description": "Not found."
           }
         }
       },
@@ -108,8 +177,9 @@
             "required": true,
             "name": "body",
             "in": "body",
-            "schema": {
-              "$ref": "#/definitions/user"
+            "schema": {"$ref": "#/definitions/user"
+
+
             }
           }
         ],
@@ -118,13 +188,10 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/user"
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Failed. Wrong data."
+            "description": "Failed.."
           }
         },
         "consumes": [
@@ -146,16 +213,13 @@
         ],
         "responses": {
           "204": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/login"
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Failed. Misunderstood Request."
+            "description": "Failed."
           },
           "404": {
-            "description": "Failed. Film was not found."
+            "description": "Not found."
           }
         }
       }
@@ -199,6 +263,10 @@
           "type": "string",
           "format": "string"
         },
+        "birthdate": {
+          "type": "string",
+          "format": "date"
+        },
         "blocked": {
           "type": "boolean"
         },
@@ -210,13 +278,44 @@
         }
       }
     },
-    "users Response": {
+    "users list": {
       "type": "object",
       "properties": {
-        "bookRequest": {
+        "user list": {
           "type": "object",
           "additionalProperties": {
-            "$ref": "#/definitions/user"
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "format": "string"
+              },
+              "surname": {
+                "type": "string",
+                "format": "string"
+              },
+              "login": {
+                "type": "string",
+                "format": "string"
+              },
+              "password": {
+                "type": "string",
+                "format": "string"
+              },
+              "birthdate": {
+                "type": "string",
+                "format": "date"
+              },
+              "blocked": {
+                "type": "boolean"
+              },
+              "admin": {
+                "type": "boolean"
+              },
+              "readonly": {
+                "type": "boolean"
+              }
+            }
           }
         }
       }

@@ -1,4 +1,5 @@
 import json
+import logging
 
 from aiohttp import web
 from aiohttp.web_request import Request
@@ -16,6 +17,8 @@ routes = web.RouteTableDef()
 DB_URL = 'postgresql://admin:admin@localhost/postgres'
 engine = create_engine(DB_URL)
 
+log = logging.getLogger(__name__)
+
 
 def redirect(route_name):
     location = f'/{route_name}'
@@ -24,7 +27,7 @@ def redirect(route_name):
 
 @routes.get('/', allow_head=False)
 async def index(request):
-
+    log.debug('index page req')
     return web.Response(
         text='/login POST\n/logoff GET\n'
              '/users GET\t\t\t*show all*\n/users POST\t\t\t*create new*\n'
@@ -35,13 +38,14 @@ async def index(request):
 
 @routes.post('/login')
 async def login(request: Request):
-
+    log.debug('login request')
     with engine.begin() as conn:
         check_for_valid_error = await validate_auth_form(conn, request)
         if check_for_valid_error:
             return web.HTTPBadRequest(text=check_for_valid_error)
         else:
             user_login = UserAuth.parse_raw(await request.text()).login
+            log.debug(f'Auth as {user_login} successful')
             response = web.HTTPOk(text=f'Auth as {user_login} successful')
             await remember(request, response, user_login)
             return response
@@ -51,6 +55,7 @@ async def login(request: Request):
 
 @routes.get('/logout')
 async def logout(request:Request):
+    log.debug('logged out')
     response = web.HTTPOk(text='Logged off')
     await forget(request, response)
     return response
@@ -61,10 +66,10 @@ async def logout(request:Request):
 
 @routes.get('/users')
 async def get_all_users_view(request: Request):
+    log.debug('get user list req, checking PERM')
     await check_permission(request, 'readonly')
-
+    log.debug('get user list req, PERM granted, loading list')
     with engine.begin() as conn:
-        username = await authorized_userid(request)
         all_users = await db.get_all_users(conn)
         model_all_users = [User.parse_obj(user) for user in all_users]
         dict_all_users = [model_user.json() for model_user in model_all_users]
@@ -78,9 +83,10 @@ async def get_all_users_view(request: Request):
 
 @routes.post('/users')
 async def create_user_view(request: Request):
-
-    await check_permission(request, 'admin')
-
+    log.debug('create user req, checking PERM')
+    k = await check_permission(request, 'admin')
+    log.debug(k)
+    log.debug('create user req, PERM granted, creating user')
     with engine.begin() as conn:
         new_user = User.parse_raw(await request.text())
         new_user.password = generate_password(new_user.password)
@@ -88,9 +94,10 @@ async def create_user_view(request: Request):
 
 
 @routes.get('/users/{login}')
-async def get_one_user_view(request:Request):
-    await check_permission(request, 'readonly')
-
+async def get_one_user_view(request: Request):
+    log.debug('get exact user req, checking PERM')
+    await check_permission(request, 'admin')
+    log.debug('create user req, PERM, granted, fetching user')
     login = request.match_info['login']
     with engine.begin() as conn:
         user = await db.get_one_user(engine, login)
@@ -102,9 +109,10 @@ async def get_one_user_view(request:Request):
 
 
 @routes.post('/users/{login}')
-async def update_user_view(request:Request):
+async def update_user_view(request: Request):
+    log.debug('change user req, checking PERM')
     await check_permission(request, 'admin')
-
+    log.debug('change user req, PERM granted, updaintg')
     login = request.match_info['login']
     with engine.begin() as conn:
         user_model = User.parse_raw(await request.text())
@@ -118,8 +126,13 @@ async def update_user_view(request:Request):
 
 @routes.delete('/users/{login}')
 async def delete_user_view(request: Request):
+    log.debug('del user req, checking PERM')
     await check_permission(request, 'admin')
-
-    login = request.match_info['login']
-    with engine.begin() as conn:
-        return await db.delete_user(conn, login)
+    log.debug('del user req, PERM granted, tryin to del user')
+    logged_username = await authorized_userid(request)
+    login_to_del = request.match_info['login']
+    if not logged_username == login_to_del:
+        with engine.begin() as conn:
+            return await db.delete_user(conn, login_to_del)
+    else:
+        return web.HTTPForbidden(text='Cant delete self')
