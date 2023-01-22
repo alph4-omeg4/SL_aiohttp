@@ -1,6 +1,8 @@
+import pathlib
 import pytoml as toml
 
-CONFIG_PATH = "config/config.toml"
+BASE_DIR = pathlib.Path(__file__).parent
+CONFIG_PATH = f"{BASE_DIR}/config/config.toml"
 
 
 def load_config(path):

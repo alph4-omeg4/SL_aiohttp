@@ -6,6 +6,7 @@ from models.models import UserAuth
 
 log = logging.getLogger(__name__)
 
+
 async def validate_auth_form(conn, request):
     log.debug(f'auth form validation requested')
 

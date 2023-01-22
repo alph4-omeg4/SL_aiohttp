@@ -1,5 +1,5 @@
 from sqlalchemy import (MetaData, Table, Column, ForeignKey,
-                        Integer, String, Boolean, DateTime, UniqueConstraint, Index)
+                        String, Boolean, DateTime, UniqueConstraint, Index)
 
 metadata = MetaData()
 

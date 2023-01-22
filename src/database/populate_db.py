@@ -38,4 +38,4 @@ async def main():
         await create_user(conn, admin_data)
 
 
-asyncio.run(main())
+populate = asyncio.run(main())

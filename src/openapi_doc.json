@@ -19,9 +19,7 @@
         "summary": "Show index p",
         "responses": {
           "200": {
-            "description": "OK",
-            "schema":
-          }
+            "description": "OK"}
         },
         "parameters": []
       }
@@ -37,13 +35,10 @@
         ],
         "responses": {
           "201": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/login_form"
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Failed. Wrong data."
+            "description": "Failed."
           }
         },
         "parameters": [

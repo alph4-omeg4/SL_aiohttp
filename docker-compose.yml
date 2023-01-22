@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+ db:
+  image: postgres:latest
+  environment:
+
+    POSTGRES_DATABASE: postgres
+    POSTGRES_USER: admin
+    POSTGRES_PASSWORD: admin
+
+  container_name: sl_db
+  restart: always
+  volumes:
+    - ./sl:/sl
+  ports:
+    - "5432"
+
+
+ app:
+  build: .
+  container_name: sl_aiohttp
+  restart: always
+  depends_on:
+    - db
+
+networks:
+  dock-db-test:
+    external: false
+    name: dock-db-test

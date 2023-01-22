@@ -6,7 +6,7 @@ from aiohttp.web_request import Request
 from aiohttp_security import remember, forget, authorized_userid, check_permission
 from sqlalchemy import create_engine
 
-from db import update_user
+from database.db import update_user
 from models.models import User, UserAuth
 from security import generate_password
 from src.database import db
@@ -49,12 +49,12 @@ async def login(request: Request):
             response = web.HTTPOk(text=f'Auth as {user_login} successful')
             await remember(request, response, user_login)
             return response
-        return web.HTTPBadRequest(text='Auth failed')
+
 
 
 
 @routes.get('/logout')
-async def logout(request:Request):
+async def logout(request: Request):
     log.debug('logged out')
     response = web.HTTPOk(text='Logged off')
     await forget(request, response)
@@ -77,7 +77,6 @@ async def get_all_users_view(request: Request):
 
         for jsoned_user in jsoned_all_users:
             del jsoned_user['password']
-        # [del jsoned_user['password'] for jsoned_user in jsoned_all_user] почитать почему дел в компрехэнш не работает
         return web.json_response(jsoned_all_users)
 
 

@@ -2,7 +2,6 @@ import logging
 from aiohttp_security.abc import AbstractAuthorizationPolicy
 from sqlalchemy import create_engine
 
-from security import check_password
 from src.database import db
 
 log = logging.getLogger(__name__)
@@ -39,14 +38,3 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
                     return True
 
             return False
-
-
-async def check_credentials(_, login, password):
-    log.debug(f'veryfin pass hash for user {login}')
-    with engine.begin() as conn:
-        user = await db.get_one_user(conn, login)
-        if user is not None:
-            password_hash = user['password']
-
-            return check_password(password_hash, password)
-    return False

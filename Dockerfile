@@ -1,14 +1,14 @@
-FROM python:3.10.5
+FROM python:3.10
+RUN mkdir -p /sl_aiohttp
+WORKDIR /sl_aiohttp
 
-RUN useradd --create-home userapi
-WORKDIR /SL_aiohttp
+COPY ./ ./
+RUN pip install -r requirements.txt
 
-RUN pip install -U pipenv
-
-COPY Pipfile .
-COPY Pipfile.lock .
-RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy --system
-COPY ./ .
+EXPOSE 9000
 
 
-EXPOSE 5432
+ENV PYTHONPATH "${PYTHONPATH}:/sl_aiohttp"
+ENV PYTHONUNBUFFERED 1
+
+CMD python src/main.py

@@ -1,7 +1,7 @@
 import asyncpgsa
 from aiohttp import web
 from sqlalchemy import select
-from db_schema import users, rights
+from database.db_schema import users, rights
 from security import generate_password
 from src.models.models import User
 

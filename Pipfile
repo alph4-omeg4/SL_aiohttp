@@ -11,6 +11,7 @@ bcrypt = "*"
 pytoml = "*"
 pydantic = "*"
 asyncio = "*"
+requests = "*"
 
 [dev-packages]
 

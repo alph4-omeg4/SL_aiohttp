@@ -1,41 +1,24 @@
 import logging
-
 from aiohttp import web
 from aiohttp_security import SessionIdentityPolicy
-from aiohttp_security import authorized_userid
 from aiohttp_security import setup as setup_security
 from aiohttp_session import setup as setup_session
 import aiohttp_session
 from aiohttp_swagger import *
 
-
 from views import routes, index
 from src.database.db_authorization import DBAuthorizationPolicy
 from src.database.db import init_db
 from src.settings import load_config, CONFIG_PATH
-
+from src.database.populate_db import populate
 
 config = load_config(CONFIG_PATH)
 
 log = logging.getLogger(__name__)
 log.debug('started')
 
-#
-# async def init_redis(app):
-#     redis_host = app["config"]["redis"]["REDIS_HOST"]
-#     redis_port = app["config"]["redis"]["REDIS_PORT"]
-#     print(f"redis://{redis_host}:{redis_port}")
-#     redis_s = redis.from_url(f"redis://{redis_host}:{redis_port}")
-#     # redis1 = redis.Redis()
-#     # redis1.ping()
-#     redis_s.ping()
-#     print(redis_s.ping)
-#     app["redis"] = redis
-#     print(type(redis_s))
-#     return redis_s
 
-
-async def init_app(config):
+async def init_app():
 
     logging.basicConfig(level=logging.DEBUG)
 
@@ -55,7 +38,7 @@ async def init_app(config):
     setup_security(app,
                    SessionIdentityPolicy(),
                    DBAuthorizationPolicy(db_pool))
-    setup_swagger(app, swagger_url="/docs", swagger_from_file="openapi_doc.json")
+    # setup_swagger(app, swagger_url="/docs", swagger_from_file="src/openapi_doc.json")
 
 
     log.debug('started')
@@ -64,7 +47,7 @@ async def init_app(config):
 
 
 def main():
-    app = init_app(config)
+    app = init_app()
     web.run_app(app, host=config['base']['HOST'], port=config['base']['PORT'])
 
 
