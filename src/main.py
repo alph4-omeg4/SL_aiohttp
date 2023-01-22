@@ -53,7 +53,7 @@ async def init_app(config):
     setup_security(app,
                    SessionIdentityPolicy(),
                    DBAuthorizationPolicy(db_pool))
-    setup_swagger(app, swagger_url="/docs", swagger_from_file="sl_swag.yaml")
+    setup_swagger(app, swagger_url="/docs", swagger_from_file="swagger.json")
 
     # s = SwaggerDocs(app, components="sl_swag.yaml", swagger_ui_settings=SwaggerUiSettings(path="/docs"))
     # s.add_routes(routes)

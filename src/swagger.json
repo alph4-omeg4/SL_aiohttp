@@ -1,0 +1,394 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "\r\n  ",
+    "version": "1.0.0",
+    "title": "SL_aiohttp Swagger Doc"
+  },
+  "tags": [
+    {
+      "name": "User base",
+      "description": ""
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "Index"
+        ],
+        "summary": "Show index p",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/users"
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "User base"
+        ],
+        "summary": "Create a new user",
+        "requestBody": {
+          "description": "User Request Post Object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "login": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "201": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/login"
+            }
+          },
+          "400": {
+            "description": "Failed. Wrong data."
+          }
+        }
+      }
+    },
+    "/logout": {
+      "get": {
+        "tags": [
+          "User base"
+        ],
+        "summary": "Logout",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": 0
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": [
+          "User Request"
+        ],
+        "summary": "Returns all available users in the system",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/users list"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "User Request"
+        ],
+        "summary": "Create a new user",
+        "requestBody": {
+          "description": "User Request Post Object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "surname": {
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "login": {
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "blocked": {
+                    "type": "boolean"
+                  },
+                  "admin": {
+                    "type": "boolean"
+                  },
+                  "readonly": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "201": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/login"
+            }
+          },
+          "400": {
+            "description": "Failed. Wrong data."
+          }
+        }
+      }
+    },
+    "/users/{login}": {
+      "get": {
+        "tags": [
+          "User Request"
+        ],
+        "summary": "Get user by login",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "uuid",
+            "required": true,
+            "description": "User Request login",
+            "schema": {
+              "properties": {
+                "login": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/user"
+            }
+          },
+          "400": {
+            "description": "Failed. Wrong data."
+          },
+          "404": {
+            "description": "Failed. User was not found."
+          }
+        }
+      },
+      "post": {
+        "summary": "Update user by login",
+        "tags": [
+          "User Request"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "login",
+            "required": true,
+            "description": "user login",
+            "schema": {
+              "properties": {
+                "login": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "User Request Object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "surname": {
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "login": {
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "blocked": {
+                    "type": "boolean"
+                  },
+                  "admin": {
+                    "type": "boolean"
+                  },
+                  "readonly": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/user"
+            }
+          },
+          "400": {
+            "description": "Failed. Wrong data."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete user by login",
+        "tags": [
+          "User Request"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "login",
+            "required": true,
+            "description": "user Request login",
+            "schema": {
+              "properties": {
+                "login": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/login"
+            }
+          },
+          "400": {
+            "description": "Failed. Misunderstood Request."
+          },
+          "404": {
+            "description": "Failed. Film was not found."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "login_form": {
+        "properties": {
+          "login": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "login": {
+        "properties": {
+          "login": {
+            "type": "string"
+          }
+        }
+      },
+      "user": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "format": "string"
+          },
+          "surname": {
+            "type": "string",
+            "format": "string"
+          },
+          "login": {
+            "type": "string",
+            "format": "string"
+          },
+          "password": {
+            "type": "string",
+            "format": "string"
+          },
+          "blocked": {
+            "type": "boolean"
+          },
+          "admin": {
+            "type": "boolean"
+          },
+          "readonly": {
+            "type": "boolean"
+          }
+        }
+      },
+      "users list": {
+        "type": "object",
+        "properties": {
+          "user list": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "format": "string"
+                },
+                "surname": {
+                  "type": "string",
+                  "format": "string"
+                },
+                "login": {
+                  "type": "string",
+                  "format": "string"
+                },
+                "password": {
+                  "type": "string",
+                  "format": "string"
+                },
+                "blocked": {
+                  "type": "boolean"
+                },
+                "admin": {
+                  "type": "boolean"
+                },
+                "readonly": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
