@@ -1,7 +1,10 @@
 import datetime
+import json
+
 from sqlalchemy import create_engine
 
 import db
+from models.models import User
 from security import generate_password, check_password
 
 DB_URL = 'postgresql://admin:admin@localhost/postgres'
@@ -15,18 +18,21 @@ def test_generate_password():
 
 
 async def test_create_user():
-    test_c_profile = {'name': 'tester',
-                      'surname': 'tester',
-                      'login': 'tester',
-                      'password': 'tester',
-                      'birthdate': datetime.date(1970, 1, 1),
-                      'blocked': False,
-                      'admin': True,
-                      'readonly': False
-                      }
-    # with engine.begin() as conn:
-    #     res = await db.create_user(conn, test_profile)
-    #     assert
+    test_profile = {'name': 'tester',
+                    'surname': 'tester',
+                    'login': 'tester',
+                    'password': 'tester',
+                    'birthdate': datetime.date(1970, 1, 1),
+                    'blocked': False,
+                    'admin': True,
+                    'readonly': False
+                    }
+
+    test_user = User.parse_obj(test_profile)
+
+    with engine.begin() as conn:
+        res = await db.create_user(conn, test_user)
+        assert res.text == 'User tester successfully created.'
 
 
 async def test_get_all_users():
@@ -44,23 +50,25 @@ async def test_get_one_user():
 
 async def test_update_user():
     pass
-    test_u_profile = {'name': 'admint',
-                      'surname': 'admint',
-                      'login': 'admin',
-                      'password': 'admint',
+    test_u_profile = {'name': 'updated_tester',
+                      'surname': 'tester',
+                      'login': 'tester',
+                      'password': 'tester',
                       'birthdate': datetime.date(1970, 1, 1),
                       'blocked': False,
                       'admin': True,
                       'readonly': False
                       }
 
-    with engine.begin() as conn:
-        res = await db.update_user(conn, test_u_profile)
-        print(res)
+    test_u_user = User.parse_obj(test_u_profile)
 
+    with engine.begin() as conn:
+        res = await db.update_user(conn, test_u_user)
+        assert res.text == 'User tester successfully  updated.'
 
 
 async def test_delete_user():
-    user = 'admin'
-    # with engine.begin() as conn:
-    #     res = await db.delete_user(conn, user)
+    user = 'tester'
+    with engine.begin() as conn:
+        res = await db.delete_user(conn, user)
+        assert res.text == 'User tester successfully deleted.'
