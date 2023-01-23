@@ -33,7 +33,8 @@ def upgrade() -> None:
                     sa.Column('admin', sa.Boolean(), nullable=True),
                     sa.Column('readonly', sa.Boolean(), nullable=True),
                     sa.ForeignKeyConstraint(['user_login'], ['users.login'], ondelete='CASCADE'),
-                    sa.PrimaryKeyConstraint('user_login')
+                    sa.PrimaryKeyConstraint('user_login'),
+                    sa.CheckConstraint("admin <> readonly", name="check uniq rights"),
                     )
 
     op.create_unique_constraint(None, 'users', ['login'])

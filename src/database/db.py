@@ -29,22 +29,25 @@ async def init_db(app):
 
 
 async def create_user(conn, user: User):
-    body_fields = {'name': user.name,
-                   'surname': user.surname,
-                   'login': user.login,
-                   'password': generate_password(user.password),
-                   'birthdate': user.birthdate}
-    create_user_body_q = users.insert().values(body_fields)
-    conn.execute(create_user_body_q)
+    try:
+        body_fields = {'name': user.name,
+                       'surname': user.surname,
+                       'login': user.login,
+                       'password': generate_password(user.password),
+                       'birthdate': user.birthdate}
+        create_user_body_q = users.insert().values(body_fields)
+        conn.execute(create_user_body_q)
 
-    rights_fields = {"user_login": user.login,
-                     "blocked": user.blocked,
-                     "admin": user.admin,
-                     "readonly": user.readonly}
-    create_user_rights_q = rights.insert().values(rights_fields)
-    conn.execute(create_user_rights_q)
-    return web.HTTPCreated(text=f'User {user.login} successfully created.')
-
+        rights_fields = {"user_login": user.login,
+                         "blocked": user.blocked,
+                         "admin": user.admin,
+                         "readonly": user.readonly}
+        create_user_rights_q = rights.insert().values(rights_fields)
+        conn.execute(create_user_rights_q)
+        return web.HTTPCreated(text=f'User {user.login} successfully created.')
+    except Exception as e:
+        # print(type(e))   sql integrity catch
+        return web.HTTPBadRequest(text='User exists, or 2rights (admin OR readonly')
 
 # ------------------------------------------Read
 

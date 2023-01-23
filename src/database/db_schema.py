@@ -1,5 +1,5 @@
 from sqlalchemy import (MetaData, Table, Column, ForeignKey,
-                        String, Boolean, DateTime, UniqueConstraint, Index)
+                        String, Boolean, DateTime, CheckConstraint)
 
 metadata = MetaData()
 
@@ -20,7 +20,7 @@ rights = Table(
     Column('user_login', String(64), ForeignKey('users.login', ondelete='CASCADE'), primary_key=True),
     Column('blocked', Boolean, default=False),
     Column('admin', Boolean, default=False),
-    Column('readonly', Boolean, default=True)
-    # UniqueConstraint("admin", "readonly", name="uniq rights level constraint")
+    Column('readonly', Boolean, default=True),
+    CheckConstraint("admin <> readonly", name="check uniq rights")
 
 )
