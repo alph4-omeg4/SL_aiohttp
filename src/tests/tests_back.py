@@ -1,14 +1,14 @@
 import datetime
 import json
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_async_engine
 
 import db
 from models.models import User
 from security import generate_password, check_password
 
-DB_URL = 'postgresql://admin:admin@localhost/postgres'
-engine = create_engine(DB_URL)
+DB_URL = 'postgresql+asyncpg://admin:admin@localhost/postgres'
+engine = create_async_engine(DB_URL)
 
 
 def test_generate_password():

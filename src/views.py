@@ -1,21 +1,19 @@
 import json
 import logging
-
 from aiohttp import web
 from aiohttp.web_request import Request
 from aiohttp_security import remember, forget, authorized_userid, check_permission
-from sqlalchemy import create_engine
 
 from database.db import update_user
-from models.models import User, UserAuth
+from models.models import User, UserAuth, UserOne, UserMany
 from security import generate_password
 from src.database import db
 from src.form_validation import validate_auth_form
 
 routes = web.RouteTableDef()
 
-DB_URL = 'postgresql://admin:admin@localhost/postgres'
-engine = create_engine(DB_URL)
+DB_URL = 'postgresql+asyncpg://admin:admin@localhost/postgres'
+# engine = create_async_engine(DB_URL)
 
 log = logging.getLogger(__name__)
 
@@ -39,7 +37,8 @@ async def index(request):
 @routes.post('/login')
 async def login(request: Request):
     log.debug('login request')
-    with engine.begin() as conn:
+    engine = request.app['engine']
+    async with engine.begin() as conn:
         check_for_valid_error = await validate_auth_form(conn, request)
         if check_for_valid_error:
             return web.HTTPBadRequest(text=check_for_valid_error)
@@ -69,24 +68,21 @@ async def get_all_users_view(request: Request):
     log.debug('get user list req, checking PERM')
     await check_permission(request, 'readonly')
     log.debug('get user list req, PERM granted, loading list')
-    with engine.begin() as conn:
+    engine = request.app['engine']
+    # не понимаю как корректно избавится от получения транзакции для пуе
+    async with engine.begin() as conn:
         all_users = await db.get_all_users(conn)
-        model_all_users = [User.parse_obj(user) for user in all_users]
-        dict_all_users = [model_user.json() for model_user in model_all_users]
-        jsoned_all_users = [json.loads(dict_user) for dict_user in dict_all_users]
-
-        for jsoned_user in jsoned_all_users:
-            del jsoned_user['password']
-        return web.json_response(jsoned_all_users)
+        # return web.json_response([UserSafe.parse_obj(user).json() for user in all_users])
+        return web.json_response(json.loads(UserMany(items=all_users).json()))
 
 
 @routes.post('/users')
 async def create_user_view(request: Request):
     log.debug('create user req, checking PERM')
-    k = await check_permission(request, 'admin')
-    log.debug(k)
+    await check_permission(request, 'admin')
     log.debug('create user req, PERM granted, creating user')
-    with engine.begin() as conn:
+    engine = request.app['engine']
+    async with engine.begin() as conn:
         new_user = User.parse_raw(await request.text())
         new_user.password = generate_password(new_user.password)
         return await db.create_user(conn, new_user)
@@ -98,13 +94,11 @@ async def get_one_user_view(request: Request):
     await check_permission(request, 'admin')
     log.debug('create user req, PERM, granted, fetching user')
     login = request.match_info['login']
-    with engine.begin() as conn:
-        user = await db.get_one_user(engine, login)
-        model_user = User.parse_obj(user)
-        dict_user = model_user.json()
-        jsoned_user = json.loads(dict_user)
-        del jsoned_user['password']
-        return web.json_response(jsoned_user)
+    engine = request.app['engine']
+    async with engine.begin() as conn:
+        user = await db.get_one_user(conn, login)
+        # return web.json_response(UserSafe.parse_obj(user).json())
+        return web.json_response(json.loads(UserOne(item=user).json()))
 
 
 @routes.post('/users/{login}')
@@ -113,10 +107,10 @@ async def update_user_view(request: Request):
     await check_permission(request, 'admin')
     log.debug('change user req, PERM granted, updaintg')
     login = request.match_info['login']
-    with engine.begin() as conn:
+    engine = request.app['engine']
+    async with engine.begin() as conn:
         user_model = User.parse_raw(await request.text())
         user_dict = user_model.dict()
-        # пароль шифруется ниже его можно тоже менять
         if user_dict['login'] != login:
             raise web.HTTPNonAuthoritativeInformation(text='Error: Wrong login')
         return await update_user(conn, user_model)
@@ -130,8 +124,9 @@ async def delete_user_view(request: Request):
     log.debug('del user req, PERM granted, tryin to del user')
     logged_username = await authorized_userid(request)
     login_to_del = request.match_info['login']
+    engine = request.app['engine']
     if not logged_username == login_to_del:
-        with engine.begin() as conn:
+        async with engine.begin() as conn:
             return await db.delete_user(conn, login_to_del)
     else:
-        return web.HTTPForbidden(text='Cant delete self')
+        raise web.HTTPForbidden(text='Cant delete self')

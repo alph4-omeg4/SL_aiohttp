@@ -1,16 +1,15 @@
 import logging
+import aiohttp_session
 from aiohttp import web
 from aiohttp_security import SessionIdentityPolicy
 from aiohttp_security import setup as setup_security
 from aiohttp_session import setup as setup_session
-import aiohttp_session
 from aiohttp_swagger import *
 
-from views import routes, index
+from views import routes
 from src.database.db_authorization import DBAuthorizationPolicy
-from src.database.db import init_db
 from src.settings import load_config, CONFIG_PATH
-from src.database.populate_db import populate
+from db import init_db
 
 config = load_config(CONFIG_PATH)
 
@@ -29,16 +28,16 @@ async def init_app():
 
     app.router.add_routes(routes)
 
-    db_pool = await init_db(app)
-
-    app.router.add_route('GET', "/", index)
-
     setup_session(app, aiohttp_session.SimpleCookieStorage())
+
+    engine = await init_db(app)
 
     setup_security(app,
                    SessionIdentityPolicy(),
-                   DBAuthorizationPolicy(db_pool))
-    # setup_swagger(app, swagger_url="/docs", swagger_from_file="src/openapi_doc.json")
+                   DBAuthorizationPolicy(engine))
+
+    setup_swagger(app, swagger_url="/docs", swagger_from_file="./openapi_doc.json")
+
 
 
     log.debug('started')

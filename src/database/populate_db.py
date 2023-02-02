@@ -1,10 +1,21 @@
 import datetime
 import asyncio
-from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import create_async_engine
 
 from database.db import create_user
 from database.db_schema import metadata
 from models.models import User
+
+
+DB_URL = 'postgresql+asyncpg://admin:admin@localhost/postgres'
+mapping = {
+    'pool_size': 10,
+    'max_overflow': 10,
+    'pool_timeout': 30,
+    'pool_recycle': 1800
+}
+
+engine = create_async_engine(DB_URL, **mapping)
 
 
 admin_profile = {'name': 'admin',
@@ -18,24 +29,13 @@ admin_profile = {'name': 'admin',
                  }
 
 
-DB_URL = 'postgresql://admin:admin@localhost/postgres'
-mapping = {
-    'pool_size': 10,
-    'max_overflow': 10,
-    'pool_timeout': 30,
-    'pool_recycle': 1800
-}
-
-engine = create_engine(DB_URL, **mapping)
-
-
 async def main():
-    metadata.drop_all(engine)
-    metadata.create_all(engine)
     admin_data = User.parse_obj(admin_profile)
-
-    with engine.begin() as conn:
+    async with engine.begin() as conn:
+        await conn.run_sync(metadata.drop_all)
+        await conn.run_sync(metadata.create_all)
         await create_user(conn, admin_data)
 
 
-populate = asyncio.run(main())
+asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+asyncio.run(main())
