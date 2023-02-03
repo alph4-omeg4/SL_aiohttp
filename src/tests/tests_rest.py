@@ -15,7 +15,7 @@ async def test_login(aiohttp_client):
     assert text == 'Auth as admin successful'
     assert resp.status == 200
 
-#
+
 async def test_logout(aiohttp_client):
     client = await aiohttp_client(await init_app())
     resp = await client.get("/logout")

@@ -36,7 +36,7 @@ async def init_app():
                    SessionIdentityPolicy(),
                    DBAuthorizationPolicy(engine))
 
-    setup_swagger(app, swagger_url="/docs", swagger_from_file="./openapi_doc.json")
+    # setup_swagger(app, swagger_url="/docs", swagger_from_file="./openapi_doc.json")
 
 
 

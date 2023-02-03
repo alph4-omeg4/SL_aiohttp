@@ -75,14 +75,14 @@ async def update_user(conn, user: User):
                    'password': user.password,
                    'birthdate': user.birthdate}
     update_user_body_q = users.update().values(body_fields).where(users.c.login == user.login)
-    conn.execute(update_user_body_q)
+    await conn.execute(update_user_body_q)
 
     rights_fields = {"user_login": user.login,
                      "blocked": user.blocked,
                      "admin": user.admin,
                      "readonly": user.readonly}
     update_user_rights_q = rights.update().values(rights_fields).where(rights.c.user_login == user.login)
-    conn.execute(update_user_rights_q)
+    await conn.execute(update_user_rights_q)
     return web.HTTPResetContent(text=f'User {user.login} successfully  updated.')
 
 
@@ -90,7 +90,6 @@ async def update_user(conn, user: User):
 
 
 async def delete_user(conn, login):
-    delete_user_q = users.delete().where(users.c.login == login)
-    conn.execute(delete_user_q)
+    await conn.execute(users.delete().where(users.c.login == login))
     return web.HTTPNoContent()
 
