@@ -119,7 +119,6 @@ views:
 Пара тестов на crud
 
 # Некрасивости ( TODO )
-- Не ловятся эскепшны (наделать try)
-- Нет тайпхинта
-- Мб скорректировать респонсы
-- Docker (поднимаю композ, бд норм, а апп постоянно  Connect call failed, mb bridge?)
+- try:except
+- typehint
+- Docker (в compose нет коннкета между PG и app (Connect call failed) mb bridge?
