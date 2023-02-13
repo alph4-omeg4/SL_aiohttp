@@ -7,8 +7,11 @@ ________________________________________________________________________________
 ### Overview
 
 asyncio
+
 Web REST aiohttp
+
 БД PostgreSQL с валидацией, схема и миграции Alembic. SQL Alchemy core ~1.4
+
 <img src="erd.png" width="55%" height="55%" />
 
 Аутентификация и авторизация на aiohttp-security:
@@ -17,7 +20,9 @@ Web REST aiohttp
 - куки сессия
 
 Валидация моделей запросов и ответов с Pydantic
+
 Логи
+
 OpenAPI документация Эндпоинтов и форм (Swagger)
 
 
